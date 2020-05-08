@@ -36,35 +36,56 @@ class ProductList(View):
 		products = Product.objects.filter(**product_filter).values()
 		
 		for product in products:
-			category = Category.objects.get(id=product['category_id'])
 			collection = Collection.objects.get(id=product['collection_id'])
 			size = Size.objects.get(id=product['size_id'])
 			material = Material.objects.get(id=product['material_id'])
-			bezel = Bezel.objects.get(id=product['bezel_id'])
-			bracelet = Bracelet.objects.get(id=product['bracelet_id'])
-			dial = Dial.objects.get(id=product['dial_id'])
 			
 			data = {
 				'id':product['id'],
-				'category':category.name,
 				'collection':collection.name,
 				'size':size.size,
 				'material':material.name,
-				'bezel':bezel.name,
-				'bracelet':bracelet.name,
-				'dial':dial.name,
 				'name':product['name'],
 				'thumbnail':product['thumbnail'],
-				'header_image':product['header_image'],
-				'header_background_image':product['header_background_image'],
-				'description':product['description'],
-				'sub_description':product['sub_description'],
-				'price':product['price'],
-				'middle_thumbnail_image':product['middle_thumbnail_image'],
-				'middle_image':product['middle_image'],
-				'middle_title':product['middle_title'],
-				'middle_sub_title':product['middle_sub_title'],
-				'middle_description':product['middle_description']
 			}
 			return JsonResponse({'data':data}, status=200)
 		return JsonResponse({'message':'No Data'}, status=400)
+
+
+class ProductDetail(View):
+	def get(self, request, product_id):
+		products = Product.objects.filter(id=product_id)
+		features = Feature.objects.filter(product_id=product_id).values()
+		result = []
+		for product in products:
+			data = {
+				'id':product.id,
+				'category':product.category.name,
+				'collection':product.collection.name,
+				'size':product.size.size,
+				'material':product.material.name,
+				'name':product.name,
+				'header_image':product.header_image,
+				'header_background_image':product.header_background_image,
+				'description':product.description,
+				'sub_description':product.sub_description,
+				'price':product.price,
+				'middle_thumbnail_image':product.middle_thumbnail_image,
+				'middle_image':product.middle_image,
+				'middle_title':product.middle_title,
+				'middle_sub_title':product.middle_sub_title,
+				'middle_description':product.middle_description,
+			}
+			result.append(data)
+			
+		for feature in features:
+			feature_data = {
+				'feature_title':feature['title'],
+				'feature_sub_title':feature['sub_title'],
+				'feature_description':feature['description'],
+				'feature_thumbnail_image':feature['thumbnail_image'],
+				'feature_image':feature['image']
+			}
+			result.append(feature_data)
+		return JsonResponse({'data':result}, status=200)
+
