@@ -13,7 +13,7 @@ class ProductList(View):
 		bezel = request.GET.get('bezel', None)
 		bracelet = request.GET.get('bracelet', None)
 		dial = request.GET.get('dial', None)
-		
+
 		product_filter = {
 			'size__size':size,
 			'material__name':material,
@@ -32,14 +32,14 @@ class ProductList(View):
 			del(product_filter['bracelet__name'])
 		if dial == None:
 			del(product_filter['dial__name'])
-			
+
 		products = Product.objects.filter(**product_filter).values()
-		
+
 		for product in products:
 			collection = Collection.objects.get(id=product['collection_id'])
 			size = Size.objects.get(id=product['size_id'])
 			material = Material.objects.get(id=product['material_id'])
-			
+
 			data = {
 				'id':product['id'],
 				'collection':collection.name,
@@ -77,7 +77,7 @@ class ProductDetail(View):
 				'middle_description':product.middle_description,
 			}
 			result.append(data)
-			
+
 		for feature in features:
 			feature_data = {
 				'feature_title':feature['title'],
